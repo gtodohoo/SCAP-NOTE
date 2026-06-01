@@ -23,12 +23,19 @@ jobs:
         pip install pyinstaller
 
     - name: Build App
-      # CHANGE "main.py" BELOW TO YOUR ACTUAL FILE NAME IF IT IS DIFFERENT
       run: |
         pyinstaller --onefile --windowed XJT.py 
 
-    - name: Upload Finished App
+    - name: Package into DMG
+      run: |
+        # 在打包文件夹中创建一个指向“应用程序(Applications)”的快捷方式
+        ln -s /Applications dist/Applications
+        # 使用 macOS 自带工具，将整个 dist 文件夹打包成一个 DMG 文件
+        hdiutil create -volname "TransparentNote" -srcfolder dist/ -ov -format UDZO TransparentNote.dmg
+
+    - name: Upload Finished DMG
       uses: actions/upload-artifact@v4
       with:
-        name: My-Mac-App
-        path: dist/
+        name: Mac-App-DMG
+        # 告诉 GitHub 这次直接上传 DMG 文件，而不是整个文件夹
+        path: TransparentNote.dmg
